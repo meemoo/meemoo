@@ -2,20 +2,20 @@
   var meemoo = {
     parentWindow: void 0,
     connectedTo: [],
-    initialize: function () {
-      this.parentWindow = window.opener ? window.opener : window.parent ? window.parent : void 0;
-      window.addEventListener("message", this.recieve, false);
-      var info = {
-        "title": document.title,
-        "author": document.getElementsByName("author")[0].content,
-        "description": document.getElementsByName("description")[0].content
-      };
+    ready: function () {
+      var info = {};
+      if (document.title) 
+        info.title = document.title;
+      if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content)
+        info.author = document.getElementsByName("author")[0].content;
+      if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content)
+        info.description = document.getElementsByName("description")[0].content;
       this.sendParent( "/info/"+encodeURIComponent(JSON.stringify(info)) );
     },
     connect: function (toIndex) {
-      // Make sure it is an integer
-      toIndex = parseInt(toIndex);
-      if (toIndex == toIndex) {
+      toIndex = Number(toIndex);
+      // make sure it is number and not already connected
+      if (toIndex === toIndex && this.connectedTo.indexOf(toIndex) === -1) {
         this.connectedTo.push(toIndex);
       }
     },
@@ -39,9 +39,21 @@
       }
     },
     recieve: function (e) {
-      
-    }
+      var message = e.data.split("/");
+      if( $meemoo.actions.hasOwnProperty(message[1]) ) {
+        $meemoo.actions[message[1]](message);
+      } else {
+        $meemoo.actions["default"](e.data);
+      }
+    },
+    // Define your actions like: $meemoo.actions.hello = function (e) { console.log(e); };
+    actions: {
+      default: function (e) { console.log(e); }
+    },
   };
+  
+  meemoo.parentWindow = window.opener ? window.opener : window.parent ? window.parent : void 0;
+  window.addEventListener("message", meemoo.recieve, false);
   
   if (!window.$meemoo) {
     window.$meemoo=meemoo;
