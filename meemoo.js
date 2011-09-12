@@ -33,8 +33,12 @@
         if ( message[1] && meemoo.actions.hasOwnProperty(message[1]) ) {
           meemoo.actions[message[1]](message, e);
         } else {
+          // No action specified or, not an OSC-like String
           meemoo.actions["default"](message, e);
         }
+      } else {
+        // Not a String... future imagedata & other fun
+        meemoo.actions["defaultData"](e.data);
       }
     },
     // Actions are functions available for other modules to trigger
@@ -57,7 +61,17 @@
         }
         meemoo.connectedTo = results;
       },
-      default: function (message, e) { }
+      getState: function (message, e) {
+        // Reply with the current state as an escaped JSON object
+        
+      },
+      setState: function (message, e) {
+        // Setup module with saved data
+        
+      },
+      default: function (message, e) { 
+      },
+      defaultData: function (data) { }
     },
   };
   
