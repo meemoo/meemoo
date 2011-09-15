@@ -1,12 +1,26 @@
-(function () {
+(function (window) {
   
-  if (window.$meemoo) {
+  var document = window.document;
+  
+  if (window.Meemoo) {
+    // Meemoo already loaded, don't bother
     return false;
   }
   
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     connectedTo: [],
+    types: {
+      bang: "bang",
+      boolean: "boolean",
+      int: "int",
+      number: "number",
+      string: "string",
+      osc: "osc", // slash-delimited string
+      json: "json", // encoded JSON object
+      image: "image", // ImageData
+      data: "data" // default, any data
+    },
     ready: function () {
       var info = {};
       if (document.title) 
@@ -42,7 +56,18 @@
       }
     },
     // Actions are functions available for other modules to trigger
-    // Define custom actions like: $meemoo.actions.consolelog = function (e) { console.log(e); };
+    addAction: function(name, action) {
+      meemoo.actions[name] = action.action;
+      
+      if (action.public === true || action.public === "true") {
+        // Expose port
+      }
+    },
+    addActions: function(actions) {
+      for (name in actions) {
+        meemoo.addAction(name, actions[name]);
+      }
+    },
     actions: {
       connect: function (message, e) {
         var toIndex = parseInt(message[2], 10);
@@ -62,28 +87,31 @@
         meemoo.connectedTo = results;
       },
       getState: function (message, e) {
-        // Reply with the current state as an escaped JSON object
-        
+        // Return the current state as an escaped JSON object
       },
       setState: function (message, e) {
         // Setup module with saved data
-        
       },
       default: function (message, e) { 
+        // console.log(message);
       },
-      defaultData: function (data) { }
+      defaultData: function (data) { 
+        // console.log(data);
+      }
     },
   };
   
   window.addEventListener("message", meemoo.recieve, false);
   
+  // Run this every 20ms to see if document is ready, then send info to parent
   var checkLoaded = setInterval(function(){ 
     if(document.body && document.getElementById){
       clearInterval(checkLoaded);
       meemoo.ready();
     }
-  },10);
+  }, 20);
   
-  window.$meemoo = meemoo;
+  // Expose Meemoo to the global object
+  window.Meemoo = meemoo;
   
-})();
+})(window);
