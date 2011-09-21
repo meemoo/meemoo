@@ -19,7 +19,7 @@
       osc: "osc", // slash-delimited string
       json: "json", // encoded JSON object
       image: "image", // ImageData
-      data: "data" // default, any data
+      object: "object" // anything
     },
     ready: function () {
       var info = {};
@@ -44,31 +44,33 @@
     recieve: function (e) {
       if (e.data.constructor == String) {
         var message = e.data.split("/");
-        if ( message[1] && meemoo.actions.hasOwnProperty(message[1]) ) {
-          meemoo.actions[message[1]](message, e);
+        if ( message[1] && meemoo.inputs.hasOwnProperty(message[1]) ) {
+          meemoo.inputs[message[1]](message, e);
         } else {
           // No action specified or, not an OSC-like String
-          meemoo.actions["default"](message, e);
+          meemoo.inputs["default"](message, e);
         }
       } else {
         // Not a String... future imagedata & other fun
-        meemoo.actions["defaultData"](e.data);
+        meemoo.inputs["defaultData"](e.data);
       }
     },
-    // Actions are functions available for other modules to trigger
-    addAction: function(name, action) {
-      meemoo.actions[name] = action.action;
+    // Inputs are functions available for other modules to trigger
+    addInput: function(name, input) {
+      meemoo.inputs[name] = input.action;
       
-      if (action.public === true || action.public === "true") {
+      if (input.port === true || input.port === "true") {
         // Expose port
+        var info = {name:name, type:input.type};
+        this.sendParent("/addInput/"+encodeURIComponent(JSON.stringify(info)));
       }
     },
-    addActions: function(actions) {
-      for (name in actions) {
-        meemoo.addAction(name, actions[name]);
+    addInputs: function(inputs) {
+      for (var name in inputs) {
+        meemoo.addInput(name, inputs[name]);
       }
     },
-    actions: {
+    inputs: {
       connect: function (message, e) {
         var toIndex = parseInt(message[2], 10);
         // Make sure it is number and not already connected
@@ -99,6 +101,24 @@
         // console.log(data);
       }
     },
+    // Outputs
+    addOutput: function(name, output) {
+      meemoo.outputs[name] = output;
+      
+      if (output.port === true || output.port === "true") {
+        // Expose port
+        var info = {name:name, type:output.type};
+        this.sendParent("/addOutput/"+encodeURIComponent(JSON.stringify(info)));
+      }
+    },
+    addOutputs: function(outputs) {
+      for (var name in outputs) {
+        meemoo.addOutput(name, outputs[name]);
+      }
+    },
+    outputs: {
+      
+    }
   };
   
   window.addEventListener("message", meemoo.recieve, false);
