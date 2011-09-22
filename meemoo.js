@@ -36,13 +36,18 @@
         this.parentWindow.postMessage(message, "*");
       }
     },
-    send: function (message) {
+    send: function (action, message) {
       for (var i=0; i<this.connectedTo.length; i++) {
-        this.parentWindow.frames[this.connectedTo[i]].postMessage(message, "*");
+        if (this.connectedTo[i][0] == action) {
+          this.parentWindow.frames[this.connectedTo[i][1]].postMessage("/"+this.connectedTo[i][2]+"/"+message, "*");
+        }
+        if (this.connectedTo[i][0] == "default") {
+          this.parentWindow.frames[this.connectedTo[i][1]].postMessage("/"+action+"/"+message, "*");
+        }
       }
     },
     recieve: function (e) {
-      if (e.data.constructor == String) {
+      if (e.data.constructor === String) {
         var message = e.data.split("/");
         if ( message[1] && meemoo.inputs.hasOwnProperty(message[1]) ) {
           meemoo.inputs[message[1]](message, e);
@@ -50,8 +55,16 @@
           // No action specified or, not an OSC-like String
           meemoo.inputs["default"](message, e);
         }
+      } else if (e.data.constructor === Object) {
+        for (var name in e.data) {
+          if (meemoo.inputs.hasOwnProperty(name)) {
+            meemoo.inputs[name](e.data[name]);
+          } else {
+            meemoo.inputs["defaultData"](e.data);
+          }
+        }
       } else {
-        // Not a String... future imagedata & other fun
+        // Not a String or Object... future imagedata & other fun
         meemoo.inputs["defaultData"](e.data);
       }
     },
@@ -71,22 +84,24 @@
       }
     },
     inputs: {
-      connect: function (message, e) {
-        var toIndex = parseInt(message[2], 10);
+      connect: function (edge) {
+        var toIndex = parseInt(edge.node, 10);
+        meemoo.connectedTo.push([edge.portout, toIndex, edge.portin]);
+        
         // Make sure it is number and not already connected
-        if (toIndex === toIndex && meemoo.connectedTo.indexOf(toIndex) === -1) {
-          meemoo.connectedTo.push(toIndex);
-        }
+        // if (toIndex === toIndex && meemoo.connectedTo.indexOf(toIndex) === -1) {
+        //   meemoo.connectedTo.push(toIndex);
+        // }
       },
       disconnect: function (message, e) {
-        var toIndex = parseInt(message[2], 10);
-        var results = [];
-        for(var i=0; i<meemoo.connectedTo.length; i++) {
-          if (meemoo.connectedTo[i] != toIndex) {
-            results.push(meemoo.connectedTo[i]);
-          }
-        }
-        meemoo.connectedTo = results;
+        // var toIndex = parseInt(message[2], 10);
+        // var results = [];
+        // for(var i=0; i<meemoo.connectedTo.length; i++) {
+        //   if (meemoo.connectedTo[i] != toIndex) {
+        //     results.push(meemoo.connectedTo[i]);
+        //   }
+        // }
+        // meemoo.connectedTo = results;
       },
       getState: function (message, e) {
         // Return the current state as an escaped JSON object
