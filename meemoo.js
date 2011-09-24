@@ -37,12 +37,28 @@
       }
     },
     send: function (action, message) {
+      if ( this.connectedTo.length < 1 ) return;
+      if (message === undefined) message = "";
       for (var i=0; i<this.connectedTo.length; i++) {
         if (this.connectedTo[i][0] == action) {
-          this.parentWindow.frames[this.connectedTo[i][1]].postMessage("/"+this.connectedTo[i][2]+"/"+message, "*");
+          var m;
+          if (message.constructor === String) {
+            m = "/"+this.connectedTo[i][2]+"/"+message;
+          } else {
+            m = {};
+            m[this.connectedTo[i][2]] = message;
+          }
+          this.parentWindow.frames[this.connectedTo[i][1]].postMessage(m, "*");
         }
         if (this.connectedTo[i][0] == "default") {
-          this.parentWindow.frames[this.connectedTo[i][1]].postMessage("/"+action+"/"+message, "*");
+          var m;
+          if (message.constructor === String) {
+            m = "/"+action+"/"+message;
+          } else {
+            m = {};
+            m[action] = message;
+          }
+          this.parentWindow.frames[this.connectedTo[i][1]].postMessage(m, "*");
         }
       }
     },
