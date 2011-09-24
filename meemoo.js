@@ -101,13 +101,11 @@
     },
     inputs: {
       connect: function (edge) {
-        var toIndex = parseInt(edge.node, 10);
-        meemoo.connectedTo.push([edge.portout, toIndex, edge.portin]);
-        
-        // Make sure it is number and not already connected
-        // if (toIndex === toIndex && meemoo.connectedTo.indexOf(toIndex) === -1) {
-        //   meemoo.connectedTo.push(toIndex);
-        // }
+        var toIndex = parseInt(edge.target[0], 10);
+        // Make sure it is number
+        if (toIndex === toIndex) {
+          meemoo.connectedTo.push([edge.source[1], toIndex, edge.target[1]]);
+        }
       },
       disconnect: function (message, e) {
         // var toIndex = parseInt(message[2], 10);
