@@ -50,7 +50,7 @@
           }
           this.parentWindow.frames[this.connectedTo[i][1]].postMessage(m, "*");
         }
-        if (this.connectedTo[i][0] == "default") {
+        if (this.connectedTo[i][0] == "all") {
           var m;
           if (message.constructor === String) {
             m = "/"+action+"/"+message;
@@ -69,19 +69,19 @@
           meemoo.inputs[message[1]](message, e);
         } else {
           // No action specified or, not an OSC-like String
-          meemoo.inputs["default"](message, e);
+          meemoo.inputs["all"](message, e);
         }
       } else if (e.data.constructor === Object) {
         for (var name in e.data) {
           if (meemoo.inputs.hasOwnProperty(name)) {
             meemoo.inputs[name](e.data[name]);
           } else {
-            meemoo.inputs["defaultData"](e.data);
+            meemoo.inputs["allObject"](e.data);
           }
         }
       } else {
-        // Not a String or Object... future imagedata & other fun
-        meemoo.inputs["defaultData"](e.data);
+        // Not a String or Object... ?
+        return
       }
     },
     // Inputs are functions available for other modules to trigger
@@ -119,15 +119,19 @@
       },
       getState: function (message, e) {
         // Return the current state as an escaped JSON object
+        return;
       },
       setState: function (message, e) {
         // Setup module with saved data
+        return;
       },
-      default: function (message, e) { 
+      all: function (message, e) { 
         // console.log(message);
+        return;
       },
-      defaultData: function (data) { 
+      allObject: function (data) { 
         // console.log(data);
+        return;
       }
     },
     // Outputs
