@@ -92,21 +92,30 @@
     },
     inputs: {
       connect: function (edge) {
+        // Make sure it is unique
+        for(var i=0; i<meemoo.connectedTo.length; i++) {
+          var thisEdge = meemoo.connectedTo[i];
+          if (thisEdge.source[0] === edge.source[0] && thisEdge.source[1] === edge.source[1] && thisEdge.target[0] === edge.target[0] && thisEdge.target[1] === edge.target[1]) {
+            // Not unique
+            return false;
+          }
+        }
+        // Make sure frame index is number
         var toIndex = parseInt(edge.target[0], 10);
-        // Make sure it is number
         if (toIndex === toIndex) {
           meemoo.connectedTo.push(edge);
         }
       },
-      disconnect: function (message, e) {
-        // var toIndex = parseInt(message[2], 10);
-        // var results = [];
-        // for(var i=0; i<meemoo.connectedTo.length; i++) {
-        //   if (meemoo.connectedTo[i] != toIndex) {
-        //     results.push(meemoo.connectedTo[i]);
-        //   }
-        // }
-        // meemoo.connectedTo = results;
+      disconnect: function (edge) {
+        var results = [];
+        for(var i=0; i<meemoo.connectedTo.length; i++) {
+          var thisEdge = meemoo.connectedTo[i];
+          // Only keep it if something is different
+          if (thisEdge.source[0] !== edge.source[0] || thisEdge.source[1] !== edge.source[1] || thisEdge.target[0] !== edge.target[0] || thisEdge.target[1] !== edge.target[1]) {
+            results.push(thisEdge);
+          }
+        }
+        meemoo.connectedTo = results;
       },
       getState: function (message, e) {
         // Return the current state as an escaped JSON object
