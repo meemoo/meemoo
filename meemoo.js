@@ -1,6 +1,5 @@
 (function (window) {
-  
-  var document = window.document;
+  "use strict";
   
   if (window.Meemoo) {
     // Meemoo already loaded, don't bother
@@ -10,55 +9,49 @@
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     connectedTo: [],
+    // These types define the input widget style
     types: {
       bang: "bang",
       boolean: "boolean",
       int: "int",
       number: "number",
       string: "string",
-      osc: "osc", // slash-delimited string
-      json: "json", // encoded JSON object
       image: "image", // ImageData
-      object: "object" // anything
+      object: "object" // action:data
     },
     ready: function () {
       var info = {};
-      if (document.title) 
+      if (document.title) {
         info.title = document.title;
-      if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content)
+      }
+      if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content) {
         info.author = document.getElementsByName("author")[0].content;
-      if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content)
+      }
+      if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content) {
         info.description = document.getElementsByName("description")[0].content;
-      this.sendParent( "/info/"+encodeURIComponent(JSON.stringify(info)) );
+      }
+      this.sendParent("info", info);
     },
-    sendParent: function (message){
+    sendParent: function (action, message){
       if (this.parentWindow) {
-        this.parentWindow.postMessage(message, "*");
+        var o = {};
+        o[action] = message;
+        this.parentWindow.postMessage(o, "*");
       }
     },
     send: function (action, message) {
-      if ( this.connectedTo.length < 1 ) return;
-      if (message === undefined) message = "";
+      if ( this.connectedTo.length < 1 ) { return; }
+      if (message === undefined) { message = action; }
       for (var i=0; i<this.connectedTo.length; i++) {
-        if (this.connectedTo[i][0] == action) {
+        if (this.connectedTo[i].source[1] === action) {
           var m;
           if (message.constructor === String) {
-            m = "/"+this.connectedTo[i][2]+"/"+message;
+            m = "/"+this.connectedTo[i].target[1]+"/"+message;
           } else {
             m = {};
-            m[this.connectedTo[i][2]] = message;
+            m[this.connectedTo[i].target[1]] = message;
           }
-          this.parentWindow.frames[this.connectedTo[i][1]].postMessage(m, "*");
-        }
-        if (this.connectedTo[i][0] == "all") {
-          var m;
-          if (message.constructor === String) {
-            m = "/"+action+"/"+message;
-          } else {
-            m = {};
-            m[action] = message;
-          }
-          this.parentWindow.frames[this.connectedTo[i][1]].postMessage(m, "*");
+          this.parentWindow.frames[this.connectedTo[i].target[0]].postMessage(m, "*");
         }
       }
     },
@@ -66,22 +59,19 @@
       if (e.data.constructor === String) {
         var message = e.data.split("/");
         if ( message[1] && meemoo.inputs.hasOwnProperty(message[1]) ) {
-          meemoo.inputs[message[1]](message, e);
+          meemoo.inputs[message[1]](message[2], e);
         } else {
           // No action specified or, not an OSC-like String
-          meemoo.inputs["all"](message, e);
+          meemoo.inputs.all(e.data, e);
         }
       } else if (e.data.constructor === Object) {
         for (var name in e.data) {
           if (meemoo.inputs.hasOwnProperty(name)) {
-            meemoo.inputs[name](e.data[name]);
+            meemoo.inputs[name](e.data[name], e);
           } else {
-            meemoo.inputs["allObject"](e.data);
+            meemoo.inputs.all(e.data, e);
           }
         }
-      } else {
-        // Not a String or Object... ?
-        return
       }
     },
     // Inputs are functions available for other modules to trigger
@@ -90,13 +80,14 @@
       
       if (input.port === true || input.port === "true") {
         // Expose port
-        var info = {name:name, type:input.type};
-        this.sendParent("/addInput/"+encodeURIComponent(JSON.stringify(info)));
+        this.sendParent("addInput", {name:name, type:input.type});
       }
     },
     addInputs: function(inputs) {
       for (var name in inputs) {
-        meemoo.addInput(name, inputs[name]);
+        if (inputs.hasOwnProperty(name)) {
+          meemoo.addInput(name, inputs[name]);
+        }
       }
     },
     inputs: {
@@ -104,7 +95,7 @@
         var toIndex = parseInt(edge.target[0], 10);
         // Make sure it is number
         if (toIndex === toIndex) {
-          meemoo.connectedTo.push([edge.source[1], toIndex, edge.target[1]]);
+          meemoo.connectedTo.push(edge);
         }
       },
       disconnect: function (message, e) {
@@ -128,10 +119,6 @@
       all: function (message, e) { 
         // console.log(message);
         return;
-      },
-      allObject: function (data) { 
-        // console.log(data);
-        return;
       }
     },
     // Outputs
@@ -140,13 +127,14 @@
       
       if (output.port === true || output.port === "true") {
         // Expose port
-        var info = {name:name, type:output.type};
-        this.sendParent("/addOutput/"+encodeURIComponent(JSON.stringify(info)));
+        this.sendParent("addOutput", {name:name, type:output.type});
       }
     },
     addOutputs: function(outputs) {
       for (var name in outputs) {
-        meemoo.addOutput(name, outputs[name]);
+        if (outputs.hasOwnProperty(name)) {
+          meemoo.addOutput(name, outputs[name]);
+        }
       }
     },
     outputs: {
