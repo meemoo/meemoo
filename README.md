@@ -1,3 +1,11 @@
+     _____                           _     
+    |     |___ ___ _____ ___ ___    |_|___ 
+    | | | | -_| -_|     | . | . |_  | |_ -|
+    |_|_|_|___|___|_|_|_|___|___|_|_| |___|
+                                  |___|
+
+---
+
 Include this in your ```<head></head>```:
 
     <script src="http://meemoo.github.com/meemoo/meemoo.js"></script>
@@ -19,11 +27,16 @@ Then:
         },
         port: true
       },
+      getState: {
+        action: function (message, e) {
+          // Return the current state as an escaped JSON object
+          var state = {};
+          return state;
+        }
+      },
       setState: {
         action: function (data) {
-          if ( data.bpm ) {
-            Meemoo.inputs.bpm(data.bpm);
-          }
+          // Data will be an object that should contain everything needed to restore state
         }
       }
     }).addOutputs({

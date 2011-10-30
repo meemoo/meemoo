@@ -9,16 +9,6 @@
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     connectedTo: [],
-    // These types define the input widget style
-    // types: {
-    //   bang: "bang",
-    //   boolean: "boolean",
-    //   int: "int",
-    //   number: "number",
-    //   string: "string",
-    //   image: "image", // ImageData
-    //   object: "object" // action:data
-    // },
     ready: function () {
       var info = {};
       if (document.title) {
@@ -35,7 +25,7 @@
     sendParent: function (action, message){
       if (this.parentWindow) {
         var o = {};
-        o[action] = message;
+        o[action] = message ? message : action;
         this.parentWindow.postMessage(o, "*");
       }
     },
@@ -90,6 +80,8 @@
           meemoo.addInput(name, inputs[name]);
         }
       }
+      // Set all inputs, then ask for state
+      this.sendParent("stateReady");
       return meemoo;
     },
     inputs: {
@@ -107,7 +99,6 @@
         if (toIndex === toIndex) {
           meemoo.connectedTo.push(edge);
         }
-        return meemoo;
       },
       disconnect: function (edge) {
         var results = [];
@@ -119,19 +110,21 @@
           }
         }
         meemoo.connectedTo = results;
-        return meemoo;
       },
-      getState: function (message, e) {
-        // Return the current state as an escaped JSON object
-        return;
+      getState: function () {
+        // (Overwrite this)
+        // Send a state to parent, called when saving composition
+        var state = {};
+        meemoo.sendParent("state", state);
       },
-      setState: function (message, e) {
-        // Setup module with saved data
-        return;
+      setState: function (state) {
+        // (Overwrite this)
+        // Setup module with saved data matching getState() returned object
+        // Called when loading composition
       },
       all: function (message, e) { 
+        // (Overwrite this for a default action)
         // console.log(message);
-        return;
       }
     },
     // Outputs
