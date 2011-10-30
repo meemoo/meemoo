@@ -9,19 +9,30 @@
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     connectedTo: [],
-    ready: function () {
-      var info = {};
-      if (document.title) {
-        info.title = document.title;
+    setInfo: function (info) {
+      var i = {};
+      if (info.title) {
+        i.title = info.title;
+      } else if (document.title) {
+        i.title = document.title;
       }
-      if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content) {
-        info.author = document.getElementsByName("author")[0].content;
+      if (info.author) {
+        i.author = info.author;
+      } else if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content) {
+        i.author = document.getElementsByName("author")[0].content;
       }
-      if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content) {
-        info.description = document.getElementsByName("description")[0].content;
+      if (info.description) {
+        i.description = info.description;
+      } else if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content) {
+        i.description = document.getElementsByName("description")[0].content;
       }
-      this.sendParent("info", info);
+      meemoo.info = i;
+      this.sendParent("info", i);
+      return meemoo;
     },
+    // ready: function () {
+    //   
+    // },
     sendParent: function (action, message){
       if (this.parentWindow) {
         var o = {};
@@ -152,13 +163,23 @@
   
   window.addEventListener("message", meemoo.recieve, false);
   
-  // Run this every 20ms to see if document is ready, then send info to parent
-  var checkLoaded = setInterval(function(){ 
+  // Run this every 50ms to see if document is ready, then send info to parent
+  // var checkLoaded = setInterval(function(){ 
+  //   if(document.body && document.getElementById){
+  //     clearInterval(checkLoaded);
+  //     meemoo.ready();
+  //   }
+  // }, 50);
+  
+  // If no setInfo by module after 2 seconds, send defaults
+  var autoInfo = setTimeout(function(){ 
     if(document.body && document.getElementById){
-      clearInterval(checkLoaded);
-      meemoo.ready();
+      if (!meemoo.info) {
+        meemoo.setInfo({});
+      }
     }
-  }, 20);
+  }, 2000);
+  
   
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
