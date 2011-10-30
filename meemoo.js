@@ -10,15 +10,15 @@
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     connectedTo: [],
     // These types define the input widget style
-    types: {
-      bang: "bang",
-      boolean: "boolean",
-      int: "int",
-      number: "number",
-      string: "string",
-      image: "image", // ImageData
-      object: "object" // action:data
-    },
+    // types: {
+    //   bang: "bang",
+    //   boolean: "boolean",
+    //   int: "int",
+    //   number: "number",
+    //   string: "string",
+    //   image: "image", // ImageData
+    //   object: "object" // action:data
+    // },
     ready: function () {
       var info = {};
       if (document.title) {
@@ -82,6 +82,7 @@
         // Expose port
         this.sendParent("addInput", {name:name, type:input.type});
       }
+      return meemoo;
     },
     addInputs: function(inputs) {
       for (var name in inputs) {
@@ -89,6 +90,7 @@
           meemoo.addInput(name, inputs[name]);
         }
       }
+      return meemoo;
     },
     inputs: {
       connect: function (edge) {
@@ -105,6 +107,7 @@
         if (toIndex === toIndex) {
           meemoo.connectedTo.push(edge);
         }
+        return meemoo;
       },
       disconnect: function (edge) {
         var results = [];
@@ -116,6 +119,7 @@
           }
         }
         meemoo.connectedTo = results;
+        return meemoo;
       },
       getState: function (message, e) {
         // Return the current state as an escaped JSON object
@@ -138,6 +142,7 @@
         // Expose port
         this.sendParent("addOutput", {name:name, type:output.type});
       }
+      return meemoo;
     },
     addOutputs: function(outputs) {
       for (var name in outputs) {
@@ -145,6 +150,7 @@
           meemoo.addOutput(name, outputs[name]);
         }
       }
+      return meemoo;
     },
     outputs: {
       
