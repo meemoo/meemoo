@@ -8,6 +8,7 @@
   
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
+    nodeid: undefined,
     connectedTo: [],
     setInfo: function (info) {
       var i = {};
@@ -37,6 +38,7 @@
       if (this.parentWindow) {
         var o = {};
         o[action] = message ? message : action;
+        o["nodeid"] = meemoo.nodeid;
         this.parentWindow.postMessage(o, "*");
       }
     },
@@ -179,6 +181,18 @@
       }
     }
   }, 2000);
+  
+  // Set id from #id=id
+  if(window.location.hash) {
+    var hash = window.location.hash.substring(1);
+    var items = hash.split("&");
+    for (var i=0; i<items.length; i++) {
+      var item = items[i].split("=");
+      if (item[0] == "nodeid") {
+        meemoo.nodeid = item[1];
+      }
+    }
+  }
   
   
   // Expose Meemoo to the global object
