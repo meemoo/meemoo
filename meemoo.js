@@ -46,7 +46,7 @@
         if (this.connectedTo[i].source[1] === action) {
           var m;
           if (message.constructor === String) {
-            m = "/"+this.connectedTo[i].target[1]+"/"+message;
+            m = "/"+this.connectedTo[i].target[1]+"/"+encodeURIComponent(message);
           } else {
             m = {};
             m[this.connectedTo[i].target[1]] = message;
@@ -59,7 +59,7 @@
       if (e.data.constructor === String) {
         var message = e.data.split("/");
         if ( message[1] && meemoo.inputs.hasOwnProperty(message[1]) ) {
-          meemoo.inputs[message[1]](message[2], e);
+          meemoo.inputs[message[1]](decodeURIComponent(message[2]), e);
         } else {
           // No action specified or, not an OSC-like String
           meemoo.inputs.all(e.data, e);
