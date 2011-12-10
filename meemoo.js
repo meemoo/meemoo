@@ -31,9 +31,6 @@
       this.sendParent("info", i);
       return meemoo;
     },
-    // ready: function () {
-    //   
-    // },
     sendParent: function (action, message){
       if (this.parentWindow) {
         var o = {};
@@ -125,15 +122,19 @@
         meemoo.connectedTo = results;
       },
       getState: function () {
-        // (Overwrite this)
+        //TODO save these as they are input?
         // Send a state to parent, called when saving composition
         var state = {};
         meemoo.sendParent("state", state);
       },
       setState: function (state) {
-        // (Overwrite this)
         // Setup module with saved data matching getState() returned object
         // Called when loading composition
+        for (var name in state) {
+          if (meemoo.inputs.hasOwnProperty(name)) {
+            meemoo.inputs[name](state[name]);
+          }
+        }
       },
       all: function (message, e) { 
         // (Overwrite this for a default action)
