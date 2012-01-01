@@ -46,8 +46,10 @@
         if (this.connectedTo[i].source[1] === action) {
           var m;
           if (message.constructor === String) {
+            // Sends an OSC-like string: "/actionName/data"
             m = "/"+this.connectedTo[i].target[1]+"/"+encodeURIComponent(message);
           } else {
+            // Sends an object: {actionName:data}
             m = {};
             m[this.connectedTo[i].target[1]] = message;
           }
@@ -56,20 +58,25 @@
       }
     },
     recieve: function (e) {
+      var fromParent = (e.source == meemoo.parentWindow);
       if (e.data.constructor === String) {
         var message = e.data.split("/");
-        if ( message[1] && meemoo.inputs.hasOwnProperty(message[1]) ) {
+        if (!message[1]){
+          return false;
+        }
+        if ( meemoo.inputs.hasOwnProperty(message[1]) ) {
           meemoo.inputs[message[1]](decodeURIComponent(message[2]), e);
-        } else {
-          // No action specified or, not an OSC-like String
-          meemoo.inputs.all(e.data, e);
+        } else if ( fromParent && meemoo.frameworkActions.hasOwnProperty(message[1]) ) {
+          // Only do frameworkActions from the parent, not modules
+          meemoo.frameworkActions[message[1]](decodeURIComponent(message[2]), e);
         }
       } else if (e.data.constructor === Object) {
         for (var name in e.data) {
-          if (meemoo.inputs.hasOwnProperty(name)) {
+          if ( meemoo.inputs.hasOwnProperty(name) ) {
             meemoo.inputs[name](e.data[name], e);
-          } else {
-            meemoo.inputs.all(e.data, e);
+          } else if ( fromParent && meemoo.frameworkActions.hasOwnProperty(name) ) {
+            // Only do frameworkActions from the parent, not sibling modules
+            meemoo.frameworkActions[name](e.data[name], e);
           }
         }
       }
@@ -78,7 +85,7 @@
     addInput: function(name, input) {
       meemoo.inputs[name] = input.action;
       
-      if (input.port === true || input.port === "true") {
+      if (input.port !== false) {
         // Expose port
         this.sendParent("addInput", {name:name, type:input.type});
       }
@@ -95,6 +102,30 @@
       return meemoo;
     },
     inputs: {
+      
+    },
+    // Outputs
+    addOutput: function(name, output) {
+      meemoo.outputs[name] = output;
+      
+      if (output.port !== false) {
+        // Expose port
+        this.sendParent("addOutput", {name:name, type:output.type});
+      }
+      return meemoo;
+    },
+    addOutputs: function(outputs) {
+      for (var name in outputs) {
+        if (outputs.hasOwnProperty(name)) {
+          meemoo.addOutput(name, outputs[name]);
+        }
+      }
+      return meemoo;
+    },
+    outputs: {
+      
+    },
+    frameworkActions: {
       connect: function (edge) {
         // Make sure it is unique
         for(var i=0; i<meemoo.connectedTo.length; i++) {
@@ -135,32 +166,7 @@
             meemoo.inputs[name](state[name]);
           }
         }
-      },
-      all: function (message, e) { 
-        // (Overwrite this for a default action)
-        // console.log(message);
       }
-    },
-    // Outputs
-    addOutput: function(name, output) {
-      meemoo.outputs[name] = output;
-      
-      if (output.port === true || output.port === "true") {
-        // Expose port
-        this.sendParent("addOutput", {name:name, type:output.type});
-      }
-      return meemoo;
-    },
-    addOutputs: function(outputs) {
-      for (var name in outputs) {
-        if (outputs.hasOwnProperty(name)) {
-          meemoo.addOutput(name, outputs[name]);
-        }
-      }
-      return meemoo;
-    },
-    outputs: {
-      
     }
   };
   

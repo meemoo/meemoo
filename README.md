@@ -18,33 +18,19 @@ Then:
           // Start function
           Meemoo.send("started");
         },
-        port: true
       },
       stop: {
         action: function (m) {
           // Start function
           Meemoo.send("stopped");
         },
-        port: true
       },
-      getState: {
-        action: function (message, e) {
-          // Return the current state as an escaped JSON object
-          var state = {};
-          return state;
-        }
-      },
-      setState: {
-        action: function (data) {
-          // Data will be an object that should contain everything needed to restore state
-        }
-      }
     }).addOutputs({
       started: { 
-        port: true
+        type: "bang"
       },
       stopped: { 
-        port: true
+        type: "bang"
       }
     });
   
