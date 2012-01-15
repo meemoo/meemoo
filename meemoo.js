@@ -85,9 +85,14 @@
     addInput: function(name, input) {
       meemoo.inputs[name] = input.action;
       
+      var type = input.hasOwnProperty("type") ? input.type : "";
+      var description = input.hasOwnProperty("description") ? input.description : "";
+      var min = input.hasOwnProperty("min") ? input.min : "";
+      var max = input.hasOwnProperty("max") ? input.max : "";
+      
       if (input.port !== false) {
         // Expose port
-        this.sendParent("addInput", {name:name, type:input.type});
+        this.sendParent("addInput", {name:name, type:type, description:description, min:min, max:max});
       }
       return meemoo;
     },
