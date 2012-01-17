@@ -85,14 +85,17 @@
     addInput: function(name, input) {
       meemoo.inputs[name] = input.action;
       
-      var type = input.hasOwnProperty("type") ? input.type : "";
-      var description = input.hasOwnProperty("description") ? input.description : "";
-      var min = input.hasOwnProperty("min") ? input.min : "";
-      var max = input.hasOwnProperty("max") ? input.max : "";
+      var portproperties = {};
+      portproperties.name = name;
+      portproperties.type = input.hasOwnProperty("type") ? input.type : "";
+      portproperties.description = input.hasOwnProperty("description") ? input.description : "";
+      portproperties.min = input.hasOwnProperty("min") ? input.min : "";
+      portproperties.max = input.hasOwnProperty("max") ? input.max : "";
+      portproperties.default = input.hasOwnProperty("default") ? input.default : "";
       
       if (input.port !== false) {
         // Expose port
-        this.sendParent("addInput", {name:name, type:type, description:description, min:min, max:max});
+        this.sendParent("addInput", portproperties);
       }
       return meemoo;
     },
