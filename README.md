@@ -8,7 +8,7 @@
 
 Include this in your ```<head></head>```:
 
-    <script src="http://meemoo.org/meemoo/v1/meemoo.js"></script>
+    <script src="http://meemoo.org/meemoo/v1/meemoo-min.js"></script>
 
 Then:
 
