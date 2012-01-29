@@ -29,7 +29,7 @@ Then in your script:
             Meemoo.send("reversed", reversed);
           },
           type: "string"
-        },
+        }
       })
       .addOutputs({
         squared: { 
