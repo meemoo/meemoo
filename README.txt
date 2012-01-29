@@ -4,31 +4,38 @@
 |_|_|_|___|___|_|_|_|___|___|_|_| |___|
                               |___|
 
-Include this in your <head></head>:
+Include this in your head:
 
     <script src="http://meemoo.org/meemoo/v1/meemoo-min.js"></script>
 
-Then:
+Then in your script:
 
-    Meemoo.addInputs({
-      square: {
-        action: function (n) {
-          Meemoo.send("squared", n*n);
+    Meemoo
+      .setInfo({
+        title: "example",
+        author: "forresto",
+        description: "example to show how to turn html into a Meemoo module"
+      })
+      .addInputs({
+        square: {
+          action: function (n) {
+            Meemoo.send("squared", n*n);
+          },
+          type: "number"
         },
-        type: "number"
-      },
-      reverse: {
-        action: function (s) {
-          var reversed = s.split("").reverse().join("");
-          Meemoo.send("reversed", reversed);
+        reverse: {
+          action: function (s) {
+            var reversed = s.split("").reverse().join("");
+            Meemoo.send("reversed", reversed);
+          },
+          type: "string"
         },
-        type: "string"
-      },
-    }).addOutputs({
-      squared: { 
-        type: "number"
-      },
-      reversed: { 
-        type: "string"
-      }
-    });
+      })
+      .addOutputs({
+        squared: { 
+          type: "number"
+        },
+        reversed: { 
+          type: "string"
+        }
+      });
