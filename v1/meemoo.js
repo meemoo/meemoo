@@ -86,7 +86,7 @@ This file is part of Meemoo.
           if (toFrame) {
             toFrame.postMessage(m, "*");
           } else {
-            console.error("module wat "+this.id+" "+this.frameIndex);
+            console.error("module wat "+this.nodeid+" "+this.connectedTo[i].target[0]);
           }
         }
       }
