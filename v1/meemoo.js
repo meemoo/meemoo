@@ -82,7 +82,12 @@ This file is part of Meemoo.
             m = {};
             m[this.connectedTo[i].target[1]] = message;
           }
-          this.parentWindow.frames[this.connectedTo[i].target[0]].postMessage(m, "*");
+          var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
+          if (toFrame) {
+            toFrame.postMessage(m, "*");
+          } else {
+            console.error("module wat "+this.id+" "+this.frameIndex);
+          }
         }
       }
     },
