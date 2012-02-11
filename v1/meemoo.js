@@ -172,11 +172,7 @@ This file is part of Meemoo.
             return false;
           }
         }
-        // Make sure frame index is number
-        var toIndex = parseInt(edge.target[0], 10);
-        if (toIndex === toIndex) {
-          meemoo.connectedTo.push(edge);
-        }
+        meemoo.connectedTo.push(edge);
       },
       disconnect: function (edge) {
         var results = [];
