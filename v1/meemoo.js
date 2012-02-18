@@ -69,19 +69,16 @@ This file is part of Meemoo.
       }
     },
     send: function (action, message) {
-      if ( this.connectedTo.length < 1 ) { return; }
+      if ( action === undefined || this.connectedTo.length < 1 ) { 
+        return; 
+      }
       if (message === undefined) { message = action; }
       for (var i=0; i<this.connectedTo.length; i++) {
         if (this.connectedTo[i].source[1] === action) {
           var m;
-          if (message.constructor === String) {
-            // Sends an OSC-like string: "/actionName/data"
-            m = "/"+this.connectedTo[i].target[1]+"/"+encodeURIComponent(message);
-          } else {
-            // Sends an object: {actionName:data}
-            m = {};
-            m[this.connectedTo[i].target[1]] = message;
-          }
+          // Sends an object: {actionName:data}
+          m = {};
+          m[this.connectedTo[i].target[1]] = message;
           var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
           if (toFrame) {
             toFrame.postMessage(m, "*");
@@ -93,18 +90,7 @@ This file is part of Meemoo.
     },
     recieve: function (e) {
       var fromParent = (e.source == meemoo.parentWindow);
-      if (e.data.constructor === String) {
-        var message = e.data.split("/");
-        if (!message[1]){
-          return false;
-        }
-        if ( meemoo.inputs.hasOwnProperty(message[1]) ) {
-          meemoo.inputs[message[1]](decodeURIComponent(message[2]), e);
-        } else if ( fromParent && meemoo.frameworkActions.hasOwnProperty(message[1]) ) {
-          // Only do frameworkActions from the parent, not modules
-          meemoo.frameworkActions[message[1]](decodeURIComponent(message[2]), e);
-        }
-      } else if (e.data.constructor === Object) {
+      if (e.data.constructor === Object) {
         for (var name in e.data) {
           if ( meemoo.inputs.hasOwnProperty(name) ) {
             meemoo.inputs[name](e.data[name], e);
@@ -227,18 +213,12 @@ This file is part of Meemoo.
     }
   }, 2000);
   
-  // Set id from #id=id
-  if(window.location.hash) {
-    var hash = window.location.hash.substring(1);
-    var items = hash.split("&");
-    for (var i=0; i<items.length; i++) {
-      var item = items[i].split("=");
-      if (item[0] == "nodeid") {
-        meemoo.nodeid = item[1];
-      }
-    }
+  // Set id from frame name frame_id
+  if(window.name) {
+    var id = window.name.split("_")[1];
+    id = parseInt(id, 10);
+    meemoo.nodeid = id;
   }
-  
   
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
