@@ -56,10 +56,6 @@ This file is part of Meemoo.
       } else if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content) {
         i.description = document.getElementsByName("description")[0].content;
       }
-      if ( info.hasOwnProperty("options") ) {
-        // An array of options to choose from
-        i.options = info.options;
-      }
       meemoo.info = i;
       this.sendParent("info", i);
       return meemoo;
@@ -115,6 +111,7 @@ This file is part of Meemoo.
       portproperties.description = input.hasOwnProperty("description") ? input.description : "";
       portproperties.min = input.hasOwnProperty("min") ? input.min : "";
       portproperties.max = input.hasOwnProperty("max") ? input.max : "";
+      portproperties.options = input.hasOwnProperty("options") ? input.options : "";
       portproperties.default = input.hasOwnProperty("default") ? input.default : "";
       
       if (input.port !== false) {
