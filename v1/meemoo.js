@@ -219,7 +219,6 @@ This file is part of Meemoo.
   
   // Set id from frame name frame_id
   if(window.name) {
-    console.log(window.name);
     var id = window.name.split("_")[1];
     id = parseInt(id, 10);
     meemoo.nodeid = id;
