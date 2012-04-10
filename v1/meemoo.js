@@ -41,20 +41,24 @@ This file is part of Meemoo.
     connectedTo: [],
     setInfo: function (info) {
       var i = {};
-      if (info.title) {
+      if (info.hasOwnProperty("title")) {
         i.title = info.title;
       } else if (document.title) {
         i.title = document.title;
       }
-      if (info.author) {
+      if (info.hasOwnProperty("author")) {
         i.author = info.author;
       } else if (document.getElementsByName("author").length > 0 && document.getElementsByName("author")[0].content) {
         i.author = document.getElementsByName("author")[0].content;
       }
-      if (info.description) {
+      if (info.hasOwnProperty("description")) {
         i.description = info.description;
       } else if (document.getElementsByName("description").length > 0 && document.getElementsByName("description")[0].content) {
         i.description = document.getElementsByName("description")[0].content;
+      }
+      if ( info.hasOwnProperty("options") ) {
+        // An array of options to choose from
+        i.options = info.options;
       }
       meemoo.info = i;
       this.sendParent("info", i);
@@ -215,6 +219,7 @@ This file is part of Meemoo.
   
   // Set id from frame name frame_id
   if(window.name) {
+    console.log(window.name);
     var id = window.name.split("_")[1];
     id = parseInt(id, 10);
     meemoo.nodeid = id;
