@@ -214,6 +214,20 @@ This file is part of Meemoo.
     }
   }, 2000);
   
+  var showNote = function(){
+    if(document.body && document.getElementById){
+      var note = document.createElement("div");
+      note.innerHTML = '<div style="color: #666; background-color:#FFE87C; border: 1px dotted #7d95ff; text-align:center; font-size:15px; padding:20px;">'+
+        'You are looking are a Meemoo module that should be loaded in a Meemoo app.<br />'+ 
+        'Check out <a href="http://meemoo.org/iframework/">meemoo.org/iframework</a> to see how it works. &lt;3'+
+        '</div>';
+      document.body.appendChild(note);
+    } else {
+      // body isn't ready, try again
+      setTimeout(showNote, 100);
+    }
+  };
+
   // Set id from frame name frame_id
   if(window.name) {
     var id = window.name.split("_")[1];
@@ -221,21 +235,9 @@ This file is part of Meemoo.
     meemoo.nodeid = id;
   } else {
     // not in iframework, display message
+    setTimeout(showNote, 100);
   }
 
-  var showNote = function(){
-    if(document.body && document.getElementById){
-      var note = document.createElement("div");
-      note.innerHTML = '<div style="color: #666; background-color:#FFE87C; border: 1px dotted #7d95ff;">'+
-        'You are looking are a Meemoo module that should be loaded in a Meemoo app.'+ 
-        'Check out <a href="http://meemoo.org/iframework/">meemoo.org/iframework</a> to see how it works.'+
-        '</div>';
-      document.body.appendChild(note);
-    } else {
-      // body isn't ready, try again
-      setTimeout(showNote, 100);
-    }
-  }
   
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
