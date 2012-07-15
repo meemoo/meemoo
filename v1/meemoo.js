@@ -1,33 +1,15 @@
 /*
 
-Meemoo web media wiring
+Meemoo.org hackable web apps
   by Forrest Oliphant
-    at Sembiki Interactive http://sembiki.com/
-    and Media Lab Helsinki http://mlab.taik.fi/
-    with Mozilla WebFWD http://webfwd.org/
 
 Copyright (c) 2012, Forrest Oliphant
+Open-source MIT, AGPL
 
-This file is part of Meemoo.
-  
-  Meemoo is free software: you can redistribute it and/or modify 
-  it under the terms of the GNU Affero General Public License as 
-  published by the Free Software Foundation, either version 3 of 
-  the License, or (at your option) any later version.
-  
-  Meemoo is distributed in the hope that it will be useful, but 
-  WITHOUT ANY WARRANTY; without even the implied warranty of 
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
-  GNU Affero General Public License for more details.
-  
-  You should have received a copy of the GNU Affero General 
-  Public License along with Meemoo.  If not, see 
-  <http://www.gnu.org/licenses/>.
-  
 */
 
 
-(function (window) {
+(function(){
   "use strict";
   
   if (window.Meemoo) {
@@ -64,7 +46,7 @@ This file is part of Meemoo.
       if (this.parentWindow) {
         var o = {};
         o[action] = message ? message : action;
-        o["nodeid"] = meemoo.nodeid;
+        o.nodeid = meemoo.nodeid;
         this.parentWindow.postMessage(o, "*");
       }
     },
@@ -89,7 +71,7 @@ This file is part of Meemoo.
       }
     },
     recieve: function (e) {
-      var fromParent = (e.source == meemoo.parentWindow);
+      var fromParent = (e.source === meemoo.parentWindow);
       if (e.data.constructor === Object) {
         for (var name in e.data) {
           if ( meemoo.inputs.hasOwnProperty(name) ) {
@@ -112,7 +94,7 @@ This file is part of Meemoo.
       portproperties.min = input.hasOwnProperty("min") ? input.min : "";
       portproperties.max = input.hasOwnProperty("max") ? input.max : "";
       portproperties.options = input.hasOwnProperty("options") ? input.options : "";
-      portproperties.default = input.hasOwnProperty("default") ? input.default : "";
+      portproperties["default"] = input.hasOwnProperty("default") ? input["default"] : "";
       
       if (input.port !== false) {
         // Expose port
@@ -261,4 +243,4 @@ This file is part of Meemoo.
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
   
-})(window);
+}());
