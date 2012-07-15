@@ -135,6 +135,7 @@ This file is part of Meemoo.
     },
     // Outputs
     addOutput: function(name, output) {
+      output.connected = false;
       meemoo.outputs[name] = output;
       
       if (output.port !== false) {
@@ -154,8 +155,15 @@ This file is part of Meemoo.
     outputs: {
       
     },
+    connected: function(name) {
+      return meemoo.outputs.hasOwnProperty(name) && meemoo.outputs[name].connected;
+    },
     frameworkActions: {
       connect: function (edge) {
+        // Make sure this output exists
+        if( !meemoo.outputs.hasOwnProperty(edge.source[1]) ){
+          return false;
+        }
         // Make sure it is unique
         for(var i=0; i<meemoo.connectedTo.length; i++) {
           var thisEdge = meemoo.connectedTo[i];
@@ -164,6 +172,7 @@ This file is part of Meemoo.
             return false;
           }
         }
+        meemoo.outputs[edge.source[1]].connected = true;
         meemoo.connectedTo.push(edge);
       },
       disconnect: function (edge) {
@@ -174,6 +183,16 @@ This file is part of Meemoo.
           if (thisEdge.source[0] !== edge.source[0] || thisEdge.source[1] !== edge.source[1] || thisEdge.target[0] !== edge.target[0] || thisEdge.target[1] !== edge.target[1]) {
             results.push(thisEdge);
           }
+        }
+        // See if output is still connected to anything
+        var outputCount = 0;
+        for(i=0; i<results.length; i++) {
+          if (results[i].source[1] === edge.source[1]) {
+            outputCount++;
+          }
+        }
+        if (outputCount === 0) {
+          meemoo.outputs[edge.source[1]].connected = false;
         }
         meemoo.connectedTo = results;
       },
