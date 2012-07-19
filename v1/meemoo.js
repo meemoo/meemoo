@@ -239,6 +239,18 @@ Open-source MIT, AGPL
     setTimeout(showNote, 100);
   }
 
+  // requestAnimFrame shim from http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
   
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
