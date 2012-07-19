@@ -239,8 +239,8 @@ Open-source MIT, AGPL
     setTimeout(showNote, 100);
   }
 
-  // requestAnimFrame shim from http://paulirish.com/2011/requestanimationframe-for-smart-animating/
-  window.requestAnimFrame = (function(){
+  // requestAnimationFrame shim from http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+  window.requestAnimationFrame = (function(){
       return  window.requestAnimationFrame       || 
               window.webkitRequestAnimationFrame || 
               window.mozRequestAnimationFrame    || 
