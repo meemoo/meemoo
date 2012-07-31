@@ -58,9 +58,8 @@ Open-source MIT, AGPL
       if (message === undefined) { message = action; }
       for (var i=0; i<this.connectedTo.length; i++) {
         if (this.connectedTo[i].source[1] === action) {
-          var m;
+          var m = {};
           // Sends an object: {actionName:data}
-          m = {};
           m[this.connectedTo[i].target[1]] = message;
           if (this.sendThroughParent) {
             this.sendParent("message", m);
@@ -72,16 +71,20 @@ Open-source MIT, AGPL
         }
       }
     },
+    set: function (name, value) {
+      // This pushes a port's value to the iframework node state
+      var m = {};
+      m[name] = value;
+      this.sendParent("set", m);
+    },
     recieve: function (e) {
       var fromParent = (e.source === meemoo.parentWindow);
-      if (e.data.constructor === Object) {
-        for (var name in e.data) {
-          if ( meemoo.inputs.hasOwnProperty(name) ) {
-            meemoo.inputs[name](e.data[name], e);
-          } else if ( fromParent && meemoo.frameworkActions.hasOwnProperty(name) ) {
-            // Only do frameworkActions from the parent, not sibling modules
-            meemoo.frameworkActions[name](e.data[name], e);
-          }
+      for (var name in e.data) {
+        if ( meemoo.inputs.hasOwnProperty(name) ) {
+          meemoo.inputs[name](e.data[name], e);
+        } else if ( fromParent && meemoo.frameworkActions.hasOwnProperty(name) ) {
+          // Only do frameworkActions from the parent, not sibling modules
+          meemoo.frameworkActions[name](e.data[name], e);
         }
       }
     },
