@@ -20,6 +20,7 @@ Open-source MIT, AGPL
   var meemoo = {
     parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
     nodeid: undefined,
+    sendThroughParent: false,
     connectedTo: [],
     setInfo: function (info) {
       var i = {};
@@ -61,11 +62,12 @@ Open-source MIT, AGPL
           // Sends an object: {actionName:data}
           m = {};
           m[this.connectedTo[i].target[1]] = message;
-          var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
-          if (toFrame) {
-            toFrame.postMessage(m, "*");
+          if (this.sendThroughParent) {
+            this.sendParent("message", m);
           } else {
-            console.error("module wat "+this.nodeid+" "+this.connectedTo[i].target[0]);
+            // DEPRECATED 2012.07.31
+            var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
+            toFrame.postMessage(m, "*");
           }
         }
       }
@@ -229,11 +231,18 @@ Open-source MIT, AGPL
     }
   };
 
-  // Set id from frame name frame_id
   if(window.name) {
-    var id = window.name.split("_")[1];
+    var split = window.name.split("_");
+    // Set id from frame name frame_id
+    var id = split[1];
     id = parseInt(id, 10);
     meemoo.nodeid = id;
+    // New style? (send all data through iframework)
+    // Will be default
+    var newStyle = split[split.length-1];
+    if (newStyle === "through") {
+      meemoo.sendThroughParent = true;
+    }
   } else {
     // not in iframework, display message
     setTimeout(showNote, 100);
