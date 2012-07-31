@@ -60,9 +60,10 @@ Open-source MIT, AGPL
         if (this.connectedTo[i].source[1] === action) {
           var m = {};
           if (this.sendThroughParent) {
+            m.output = action;
             m.id = this.connectedTo[i].target[0];
-            m.port = action;
-            m.val = message;
+            m.input = action;
+            m.value = message;
             this.sendParent("message", m);
           } else {
             // DEPRECATED 2012.07.31
