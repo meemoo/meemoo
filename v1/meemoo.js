@@ -61,8 +61,6 @@ Open-source MIT, AGPL
           var m = {};
           if (this.sendThroughParent) {
             m.output = action;
-            m.id = this.connectedTo[i].target[0];
-            m.input = action;
             m.value = message;
             this.sendParent("message", m);
           } else {
