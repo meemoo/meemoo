@@ -59,12 +59,15 @@ Open-source MIT, AGPL
       for (var i=0; i<this.connectedTo.length; i++) {
         if (this.connectedTo[i].source[1] === action) {
           var m = {};
-          // Sends an object: {actionName:data}
-          m[this.connectedTo[i].target[1]] = message;
           if (this.sendThroughParent) {
+            m.id = this.connectedTo[i].target[0];
+            m.port = action;
+            m.val = message;
             this.sendParent("message", m);
           } else {
             // DEPRECATED 2012.07.31
+            // Sends an object: {actionName:data}
+            m[this.connectedTo[i].target[1]] = message;
             var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
             toFrame.postMessage(m, "*");
           }
