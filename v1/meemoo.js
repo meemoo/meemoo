@@ -41,6 +41,15 @@ Open-source MIT, AGPL
       }
       meemoo.info = i;
       this.sendParent("info", i);
+
+      // In no inputs after 3 seconds, say ready
+      var autoReady = setTimeout(function(){ 
+        if (!meemoo.stateReadySent) {
+          meemoo.sendParent("stateReady");
+          meemoo.stateReadySent = true;
+        }
+      }, 3000);
+
       return meemoo;
     },
     sendParent: function (action, message){
@@ -110,6 +119,7 @@ Open-source MIT, AGPL
       }
       return meemoo;
     },
+    stateReadySent: false,
     addInputs: function(inputs) {
       for (var name in inputs) {
         if (inputs.hasOwnProperty(name)) {
@@ -118,11 +128,10 @@ Open-source MIT, AGPL
       }
       // Set all inputs, then ask for state
       this.sendParent("stateReady");
+      this.stateReadySent = true;
       return meemoo;
     },
-    inputs: {
-      
-    },
+    inputs: {},
     // Outputs
     addOutput: function(name, output) {
       output.connected = false;
@@ -142,9 +151,7 @@ Open-source MIT, AGPL
       }
       return meemoo;
     },
-    outputs: {
-      
-    },
+    outputs: {},
     connected: function(name) {
       return meemoo.outputs.hasOwnProperty(name) && meemoo.outputs[name].connected;
     },
