@@ -9,7 +9,7 @@ Open-source MIT, AGPL
 */
 
 
-(function(){
+(function(window, document, undefined){
   "use strict";
   
   if (window.Meemoo) {
@@ -18,10 +18,9 @@ Open-source MIT, AGPL
   }
   
   var meemoo = {
-    parentWindow: window.opener ? window.opener : window.parent ? window.parent : void 0,
+    parentWindow: window.opener ? window.opener : window.parent ? window.parent : undefined,
     nodeid: undefined,
-    sendThroughParent: false,
-    connectedTo: [],
+    sendThroughParent: true,
     setInfo: function (info) {
       var i = {};
       if (info.hasOwnProperty("title")) {
@@ -42,7 +41,7 @@ Open-source MIT, AGPL
       meemoo.info = i;
       this.sendParent("info", i);
 
-      // In no inputs after 3 seconds, say ready
+      // If addInputs() isn't called by 3 seconds, say ready
       var autoReady = setTimeout(function(){ 
         if (!meemoo.stateReadySent) {
           meemoo.sendParent("stateReady");
@@ -61,27 +60,15 @@ Open-source MIT, AGPL
       }
     },
     send: function (action, message) {
-      if ( action === undefined || this.connectedTo.length < 1 ) { 
+      if ( action === undefined ) { 
         return; 
       }
       if (message === undefined) { message = action; }
 
       var m = {};
-      if (this.sendThroughParent) {
-        m.output = action;
-        m.value = message;
-        this.sendParent("message", m);
-      } else {
-        // DEPRECATED 2012.07.31
-        for (var i=0; i<this.connectedTo.length; i++) {
-          if (this.connectedTo[i].source[1] === action) {
-            // Sends an object: {actionName:data}
-            m[this.connectedTo[i].target[1]] = message;
-            var toFrame = this.parentWindow.frames[this.connectedTo[i].target[0]];
-            toFrame.postMessage(m, "*");
-          }
-        }
-      }
+      m.output = action;
+      m.value = message;
+      this.sendParent("message", m);
     },
     set: function (name, value) {
       // This pushes a port's value to the iframework node state
@@ -153,48 +140,18 @@ Open-source MIT, AGPL
     },
     outputs: {},
     connected: function(name) {
-      return meemoo.outputs.hasOwnProperty(name) && meemoo.outputs[name].connected;
+      // DEPRECATED 2012.09.28 ... iframework keeps track of connections
+      // return meemoo.outputs.hasOwnProperty(name) && meemoo.outputs[name].connected;
+      return true;
     },
     frameworkActions: {
       connect: function (edge) {
-        // Make sure this output exists
-        if( !meemoo.outputs.hasOwnProperty(edge.source[1]) ){
-          return false;
-        }
-        // Make sure it is unique
-        for(var i=0; i<meemoo.connectedTo.length; i++) {
-          var thisEdge = meemoo.connectedTo[i];
-          if (thisEdge.source[0] === edge.source[0] && thisEdge.source[1] === edge.source[1] && thisEdge.target[0] === edge.target[0] && thisEdge.target[1] === edge.target[1]) {
-            // Not unique
-            return false;
-          }
-        }
-        meemoo.outputs[edge.source[1]].connected = true;
-        meemoo.connectedTo.push(edge);
+        // DEPRECATED 2012.09.28 ... iframework keeps track of connections
       },
       disconnect: function (edge) {
-        var results = [];
-        for(var i=0; i<meemoo.connectedTo.length; i++) {
-          var thisEdge = meemoo.connectedTo[i];
-          // Only keep it if something is different
-          if (thisEdge.source[0] !== edge.source[0] || thisEdge.source[1] !== edge.source[1] || thisEdge.target[0] !== edge.target[0] || thisEdge.target[1] !== edge.target[1]) {
-            results.push(thisEdge);
-          }
-        }
-        // See if output is still connected to anything
-        var outputCount = 0;
-        for(i=0; i<results.length; i++) {
-          if (results[i].source[1] === edge.source[1]) {
-            outputCount++;
-          }
-        }
-        if (outputCount === 0) {
-          meemoo.outputs[edge.source[1]].connected = false;
-        }
-        meemoo.connectedTo = results;
+        // DEPRECATED 2012.09.28 ... iframework keeps track of connections
       },
       getState: function () {
-        //TODO save these as they are input?
         // Send a state to parent, called when saving composition
         var state = {};
         meemoo.sendParent("state", state);
@@ -250,12 +207,6 @@ Open-source MIT, AGPL
     var id = split[1];
     id = parseInt(id, 10);
     meemoo.nodeid = id;
-    // New style? (send all data through iframework)
-    // Will be default
-    var newStyle = split[split.length-1];
-    if (newStyle === "through") {
-      meemoo.sendThroughParent = true;
-    }
   } else {
     // not in iframework, display message
     setTimeout(showNote, 100);
@@ -277,4 +228,4 @@ Open-source MIT, AGPL
   // Expose Meemoo to the global object
   window.Meemoo = meemoo;
   
-}());
+}(window, document));
