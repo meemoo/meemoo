@@ -1,3 +1,7 @@
+DEPRECATED, now modules are not made with iframes, see: https://github.com/meemoo/iframework/tree/master/src/nodes
+
+---
+
  _____                           _     
 |     |___ ___ _____ ___ ___    |_|___ 
 | | | | -_| -_|     | . | . |_  | |_ -|
