@@ -1,4 +1,4 @@
-DEPRECATED, now modules are not made with iframes, see: https://github.com/meemoo/iframework/tree/master/src/nodes
+Reference implementation for input/output communication with a webapp, embedded in an iframe, with a typed interface.
 
 ---
 
